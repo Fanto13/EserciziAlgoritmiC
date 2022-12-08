@@ -7,10 +7,10 @@
 #include <time.h>
 #include <limits.h>
 
-#define MAX_LUNGHEZZA 20000
-#define NUM_ESPERIMENTI 10  	//ripetizione di tutti gli esperiment
-#define REP_PER_ESPERIMENTO 10      
-#define SALTO 2000   //variazione lunghezza array
+#define MAX_LUNGHEZZA 1001
+#define NUM_ESPERIMENTI 1000//con quale granularità si passa da un numero di elementi a quella successiva
+#define REP_PER_ESPERIMENTO 100
+#define SALTO 100//con quale granularità si passa da un numero di elementi a quella successiva
 
 /*Nota: SALTO*NUM_ESPERIMENTI deve essere <= MAX_LUNGHEZZA */
 
@@ -22,7 +22,7 @@ void CreaArray(int *a, int n) {
 		a[i] = rand() % (n * 10);;
 	}
 }
-
+//eseguire insertion sort, tante volte quanto è indicato, per sapere quanto tempo è passato basta fare tempo fine - tempo inizio
 
 /*************************************/
 /* COPIA DI UN ARRAY di INT DI LUNGHEZZA n IN UN ALTRO*/
@@ -39,198 +39,85 @@ void StampaArray(int *a, int n) {
 	printf("%d\n", a[n - 1]);
 }
 /*************************************/
+
 /*************************************/
 /* INSERTION SORT */
 void insertionSort(int *a, int n) {
 	for (int i = 1; i<n; ++i) {
-		int key = a[i];                //contiene l'elemento dell'array corrente
-		int j = i;
-		while (j>0 && key<a[j - 1]) { //controlla se key sia minore dell'elemento precedente, se la condizione è verificata, gli elementi vengono scambiati
-			a[j] = a[j - 1];          //l'elemento corrente viene scambiato con quello precedente
-			--j;
-		}
-		a[j] = key;//ora a[j] è il nuovo key
-	}
-}
-/*SCAMBIA*/
-void scambia(int *c,int *b)//scambia due celle dell'array
-{
-    int temp;
-    temp=*c;
-    *c=*b;
-    *b=temp;
-}
-
-/*insertion_sort tra p e q*/
-void insertionSortMod(int *a, int p, int q){
-	for (int i = p+1; i<q; ++i) {
 		int key = a[i];
 		int j = i;
-		while (j>midp && key<a[j - 1]) {
+		while (j>0 && key<a[j - 1]) {
 			a[j] = a[j - 1];
 			--j;
 		}
 		a[j] = key;
 	}
+}
 
+/*insertion_sort tra p e q*/
+void insertionSortMod(int *a, int p, int q){
+	for (int i = p+1; i<=q; ++i) {
+		int key = a[i];
+		int j = i;
+		while (j>p && key<a[j - 1]) {
+			a[j] = a[j - 1];
+			--j;
+		}
+		a[j] = key;
+	}
 }
 
 /* MERGE SORT */
 
 /*soluzione senza int max con unico array di supporto*/
-void mergeIndex(int *a, int left, int mid, int right) { //unico array di supporto????
-	int i,j;
-    int n1=mid-left+1;
-    int n2=right-mid;
-    int L[n1],R[n2];
-    for (i=0;i<n1;i++)
-        L[i]=a[i];
-    for (j=0;j<n2;j++)
-        R[j]=a[i+j];
+void mergeIndex(int *a, int left, int mid, int right) {
 
-    i=0;j=0;
-    int k;
-    for(k=left;k<right;k++)
-    {
-        if (j==n2)//quando j è il massimo indice dell'array di dx, significa che siamo arrivati alla fine e quindi vengono salvati nell'array totale gli elementi dell'array di sx
-        {
-            for(k;k<right;k++)
-            {
-                a[k]=L[i];
-            }
-        }
-        else     // oppure senza else qui ma con i++ tra riga 23 e 24
-            if(L[i]<=R[j] && i!=n1)//controlla se l'elemento corrente dell'array di sinistra è <= dell'elemento corrente dell'array di dx ed inoltre che che non siamo arrivati alla fine dell'array
-            {
-                a[k]=L[i];
-                if(j!=n2)//si entra in questa condizione quando R[j] <= L[i] ed inoltre si controla che l'array non sia terminato
-                {
-                    a[k]=R[j];
-                    j++;
-                }
-    }
 
 }
 
-
 /*soluzione con int max*/
 void mergeIntMax(int *a, int p, int q, int r) {
-	int i,j;
-    int n1=q-p+1;//sottrae l'indice centrale all'indice iniziale e somma uno
-    int n2=r-q;//indice finale meno indice centrale 
-    int L[n1+1],R[n2        else     // oppure senza else qui ma con i++ tra riga 23 e 24
-	if(L[i]<=R[j] && i!=n1)//controlla se l'elemento corrente dell'array di sinistra è <= dell'elemento corrente dell'array di dx ed inoltre che che non siamo arrivati alla fine dell'array
-	{
-		a[k]=L[i];
-		if(j!=n2)//si entra in questa condizione quando R[j] <= L[i] ed inoltre si controla che l'array non sia terminato
-		{
-			a[k]=R[j];
-			j++;
+	int n1=q-p+1;
+	int n2=r-q;
+	int L[n1+1], R[n2+2];
+		for(i=1;i<n1;i++){
+			L[i]=A[p+i-1];
 		}
-}
+		for(j=1;j<n2;j++){
+			L[j]=A[p+j-1];
+		}
+		L[n1+1]=INT_MAX;
+		R[n2+1]=INT_MAX;
+		i=0;
+		j=0;
 
-}
-
-
-/*soluzione con int max*/
-void mergeIntMax(int *a, int p, int q, int r) {
-int i,j;
-int n1=q-p+1;   //sottrae l'indice centrale all'indice iniziale e somma uno
-int n2=r-q;     //indice finale meno indice centrale 
-int L[n1+1],R[n2+1];//definisce le due sentinelle
-for (i=0;i<n1;i++)
-L[i]=a[i];     //L conterrà la prima parte dell'array ordinato 
-for (j=0;j<n2;j++)
-R[j]=a[i+j];   //R conterrà la seconda parte dell'array ordinato, l'indice i si somma a j per non sovrascrivere L
-
-L[n1]= INT_MAX;//valori sentinella (relativo a L)
-R[n2]= INT_MAX;//valori sentinella (relativo a R)
-
-i=0;j=0;
-int k;         //variabile di comodo, che assume il primo valore dell'array
-for(k=p;k<r;k++)
-{
-if(L[i]<=R[j])//la condizione di if confronta se il primo elemento dell'array ordinato di sinistra sia minore o uguale all'array ordinato di destra
-{
-	a[k]=L[i];//in questo caso dentro all'array complessivo nella cella di a[k], verrà salvato il valore di L[i]
-	i++;     //scorre l'indice e verifica l'elemento successivo
-}			
-else
-{
-	a[k]=R[j];//altrimenti mantiene il posto
-	j++;
-}
-}
+		int(k=p;k<r,k++){
+		if(L[i]<=R[j]){
+			A[k]=L[i];
+			i=i++;
+		}
+		else A[k]=R[j];
+		j=j++;
 }
 
 /*merge sort basata su mergeIndex*/
 void mergeSortIndex(int *a, int p, int r) {
-if (p<r)
-{
-int q= (p+r)/2 ;
-mergeSortIndex(a,p,q);
-mergeSortIndex(a,q+1,+1];//definisce le due sentinelle
-    for (i=0;i<n1;i++)
-        L[i]=a[i];		//L conterrà la prima parte dell'array ordinato 
-    for (j=0;j<n2;j++)
-        R[j]=a[i+j];	// r conterrà la seconda parte dell'array ordinato, l'indice i si somma a j per non sovrascrivere L
 
-    L[n1]= INT_MAX;//valori sentinella (relativo a L)
-    R[n2]= INT_MAX;//valori sentinella (relativo a R)
-    
-    i=0;j=0;
-    int k;//variabile di comodo, che assume il primo valore dell'array
-    for(k=p;k<r;k++)
-    {
-        if(L[i]<=R[j])
-        {
-            a[k]=L[i];//la condizione di if confronta se il primo elemento dell'array ordinato di sinistra sia minore o uguale 
-            i++;     //all'array ordinato di destra, in questo caso dentro all'array complessivo nella cella di a[k], verrà salvato il valore di L[i]
-        }			//i++ per verificare l'elemento successivo
-        else
-        {
-            a[k]=R[j];
-            j++;
-        }
-    }
-}
-
-/*merge sort basata su mergeIndex*/
-void mergeSortIndex(int *a, int p, int r) {
-	if (p<r)
-	{
-		int q= (p+r)/2 ;
-		mergeSortIndex(a,p,q);
-		mergeSortIndex(a,q+1,p);
-		mergeIndex(a,p,q,r);		
-	}
 }
 
 /*merge sort basata su mergeIntMax*/
 void mergeSortIntMax(int *a, int p, int r) {
-	if (p<r)
-	{
-		int q= (p+r)/2 ;
-		mergeSortIntMax(a,p,q);
-		mergeSortIntMax(a,q+1,p);
-		mergeIntMax(a,p,q,r);		
-	}
+
 }
 
 /*soluzione ibrida: merge sort (usa mergeIntMax e insertionSort)*/
 void hybridSortIntMax(int *a, int p, int r) {
-	if((r-p) > 20)
-		mergeSortIntMax(a,p,r);
-	else
-		insertionSort(a,r);
+
 }
 
 /*soluzione ibrida: merge sort (usa mergeSortIndex ed insertionSort)*/
 void hybridSortIndex(int *a, int p, int r) {
-	if((r-p) > 20)
-		mergeSortIndex(a,p,r);
-	else
-		insertionSort(a,r);
+
 }
 
 /*merge in place*/
@@ -249,31 +136,12 @@ void inPlaceMergeSort(int *a, int p, int r) {
 
 /*suddivisione array*/
 int standardPartition(int *a, int p, int r) {
-	int x=a[r-1];//prendo ultimo valore array 
-    int i = p-1; 
-    for(int j=p;j<r-1;j++)
-    {
-        if (a[j]<=x) //se l'elemento corrente dell'array a è <= di x allora viene scambiato e messo nella parte sinistra dell'array 
-        {
-            i++;
-            scambia(&a[i],&a[j]);
-        }
-                
-    }
-    i++;
-    scambia(&a[i],&a[r-1]);         
-return i;
+
 }
 
 /*quick sort base che usa standardPartition*/
 void standardQuicksort(int *a, int p, int r) {
-	if(p<r)
-    {
-        int q=standardPartition(a,p,r);
-        standardQuicksort(a,p,q);       //  q e non q-1 come da pseudo-codice, perchè q mi serve come dim array
-                                //  non come indice ultimo elemento se no salto di due in due.
-        standardQuicksort(a,q+1,r);
-    }
+
 }
 
 /*suddivisione array casuale*/
@@ -285,7 +153,7 @@ int randomizedPartition(int *a, int p, int r) {
 void randomizedQuicksort(int *a, int p, int r) {
 }
 
-void printProgressBar(double percentage) {					//farmela spiegare
+void printProgressBar(double percentage) {
 	printf("[");
 	int PBWIDTH = 70;
 	int pos = PBWIDTH * percentage;
@@ -309,7 +177,7 @@ int main() {
 	int indice_ripetizione;
 	int lunghezza_corrente = 0;
 
-	double progress;
+	double progress;//progress bar 
 
 	clock_t inizio, fine, misurato;
 	clock_t totale_insertion_sort = 0;
@@ -353,7 +221,7 @@ int main() {
 		}
 		fine = clock();
 		misurato = fine - inizio;
-		totale_insertion_sort = misurato;
+		totale_insertion_sort += misurato;
 
 		//merge sort int max
 		inizio = clock();
@@ -363,7 +231,7 @@ int main() {
 		}
 		fine = clock();
 		misurato = fine - inizio;
-		totale_merge_sort_int_max = misurato;
+		totale_merge_sort_int_max += misurato;
 
 		//merge sort index
 		inizio = clock();
@@ -373,7 +241,7 @@ int main() {
 		}
 		fine = clock();
 		misurato = fine - inizio;
-		totale_merge_sort_index = misurato;
+		totale_merge_sort_index += misurato;
 
 		//hybrid sort int max
 		inizio = clock();
@@ -383,7 +251,7 @@ int main() {
 		}
 		fine = clock();
 		misurato = fine - inizio;
-		totale_hybrid_sort_int_max = misurato;
+		totale_hybrid_sort_int_max += misurato;
 
 		//hybrid sort index
 		inizio = clock();
@@ -393,7 +261,7 @@ int main() {
 		}
 		fine = clock();
 		misurato = fine - inizio;
-		totale_hybrid_sort_index = misurato;
+		totale_hybrid_sort_index += misurato;
 
 		//merge in place
 		inizio = clock();
@@ -403,7 +271,7 @@ int main() {
 		}
 		fine = clock();
 		misurato = fine - inizio;
-		totale_merge_sort_in_place = misurato;
+		totale_merge_sort_in_place += misurato;
 
 		//standard quicksort
 		inizio = clock();
@@ -413,7 +281,7 @@ int main() {
 		}
 		fine = clock();
 		misurato = fine - inizio;
-		totale_standard_quicksort = misurato;
+		totale_standard_quicksort += misurato;
 
 		//randomized quicksort
 		inizio = clock();
@@ -423,13 +291,13 @@ int main() {
 		}
 		fine = clock();
 		misurato = fine - inizio;
-		totale_randomized_quicksort = misurato;
+		totale_randomized_quicksort += misurato;
 
 		fprintf(fp, "%d\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu \n", lunghezza_corrente, totale_insertion_sort,
 			totale_merge_sort_int_max, totale_merge_sort_index, totale_hybrid_sort_int_max,
 			totale_hybrid_sort_index, totale_merge_sort_in_place, totale_standard_quicksort, totale_randomized_quicksort);
 
-		progress = (double)indice_esperimento / (NUM_ESPERIMENTI-1); //perchè -1??
+		progress = (double)indice_esperimento / (NUM_ESPERIMENTI-1);
 		printProgressBar(progress);
 	}
 
